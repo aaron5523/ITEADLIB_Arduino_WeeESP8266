@@ -24,31 +24,23 @@
 #include "Arduino.h"
 
 
-//#define ESP8266_USE_SOFTWARE_SERIAL
-
-
-#ifdef ESP8266_USE_SOFTWARE_SERIAL
-#include "SoftwareSerial.h"
-#endif
-
-
 /**
  * Provide an easy-to-use way to manipulate ESP8266. 
  */
 class ESP8266 {
  public:
 
-#ifdef ESP8266_USE_SOFTWARE_SERIAL
-    /*
-     * Constuctor. 
-     *
-     * @param uart - an reference of SoftwareSerial object. 
-     * @param baud - the buad rate to communicate with ESP8266(default:9600). 
-     *
-     * @warning parameter baud depends on the AT firmware. 9600 is an common value. 
-     */
-    ESP8266(SoftwareSerial &uart, uint32_t baud = 9600);
-#else /* HardwareSerial */
+//#ifdef ESP8266_USE_SOFTWARE_SERIAL
+//    /*
+//     * Constuctor.
+//     *
+//     * @param uart - an reference of SoftwareSerial object.
+//     * @param baud - the buad rate to communicate with ESP8266(default:9600).
+//     *
+//     * @warning parameter baud depends on the AT firmware. 9600 is an common value.
+//     */
+////    ESP8266(SoftwareSerial &uart, uint32_t baud = 9600);
+//#else /* HardwareSerial */
     /*
      * Constuctor. 
      *
@@ -57,10 +49,13 @@ class ESP8266 {
      *
      * @warning parameter baud depends on the AT firmware. 9600 is an common value. 
      */
-    ESP8266(HardwareSerial &uart, uint32_t baud = 9600);
-#endif
+//    ESP8266(HardwareSerial &uart, uint32_t baud = 9600);
+    ESP8266(void);
+//#endif
     
     
+    bool begin(void);
+
     /** 
      * Verify ESP8266 whether live or not. 
      *
@@ -451,17 +446,12 @@ class ESP8266 {
     bool sATCIPMUX(uint8_t mode);
     bool sATCIPSERVER(uint8_t mode, uint32_t port = 333);
     bool sATCIPSTO(uint32_t timeout);
-    
+    void printFreeMem(void);
     /*
      * +IPD,len:data
      * +IPD,id,len:data
      */
-    
-#ifdef ESP8266_USE_SOFTWARE_SERIAL
-    SoftwareSerial *m_puart; /* The UART to communicate with ESP8266 */
-#else
-    HardwareSerial *m_puart; /* The UART to communicate with ESP8266 */
-#endif
+
 };
 
 #endif /* #ifndef __ESP8266_H__ */
