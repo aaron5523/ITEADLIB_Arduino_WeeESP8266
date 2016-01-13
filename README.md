@@ -12,6 +12,9 @@ You can clone it by:
 
     git clone https://github.com/itead/ITEADLIB_Arduino_WeeESP8266.git
 
+Tested with 1.5 AT Firmware
+http://bbs.espressif.com/viewtopic.php?f=46&t=1442
+
 # Documentation
 
 Online API documentation can be reached at <http://docs.iteadstudio.com/ITEADLIB_Arduino_WeeESP8266/index.html>.
