@@ -45,6 +45,7 @@ bool ESP8266::begin(void)
 	printFreeMem();
 
     rx_empty();
+    return true;
 }
 
 bool ESP8266::kick(void)
@@ -167,6 +168,16 @@ String ESP8266::getLocalIP(void)
 {
     String list;
     eATCIFSR(list);
+    return list;
+}
+
+String ESP8266::getApMac(void)
+{
+    String list;
+    eATCIPAPMACCUR(list);
+    list.replace("+CIPAPMAC_CUR:\"","");
+    list.replace("\"","");
+    list.replace(":","");
     return list;
 }
 
@@ -674,6 +685,14 @@ bool ESP8266::eATCIFSR(String &list)
     Serial.println(F("AT+CIFSR"));
     return recvFindAndFilter("OK", "\r\r\n", "\r\n\r\nOK", list);
 }
+
+bool ESP8266::eATCIPAPMACCUR(String &list)
+{
+    rx_empty();
+    Serial.println(F("AT+CIPAPMAC_CUR?"));
+    return recvFindAndFilter("OK", "\r\n", "\r\n\r\nOK", list);
+}
+
 bool ESP8266::sATCIPMUX(uint8_t mode)
 {
     String data;

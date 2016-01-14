@@ -170,6 +170,13 @@ class ESP8266 {
     String getLocalIP(void);
     
     /**
+         * Get the Current MAC address for the ESP8266 soft station.
+         *
+         * @return the IP list.
+         */
+        String getApMac(void);
+
+    /**
      * Enable IP MUX(multiple connection mode). 
      *
      * In multiple connection mode, a couple of TCP and UDP communication can be builded. 
@@ -443,6 +450,7 @@ class ESP8266 {
     bool sATCIPCLOSEMulitple(uint8_t mux_id);
     bool eATCIPCLOSESingle(void);
     bool eATCIFSR(String &list);
+    bool eATCIPAPMACCUR(String &list);
     bool sATCIPMUX(uint8_t mode);
     bool sATCIPSERVER(uint8_t mode, uint32_t port = 333);
     bool sATCIPSTO(uint32_t timeout);
