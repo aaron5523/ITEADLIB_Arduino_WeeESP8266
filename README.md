@@ -4,6 +4,9 @@
 
 An ESP8266 library for Arduino providing an easy-to-use way to manipulate ESP8266.
 
+# Fork Differences
+This is a forked version of the original which removes the ability of the user to specify which Serial to use.  There are problems with the latest firmware using the SoftwareSerial interface at the required 115200 Baud Rate on the Arduino UNO (at least mine anyway).  I've removed the constructors and left a blank constructor.  The class will use the UNO Serial by default.  The ability to specify a SoftwareSerial for debug purposes is available.  I've replaced all of 'm_puart->' references with 'Serial.' and any one time strings printing out to the hardware serial are encapsulated with the F("") macro to reduce RAM footprint of library.
+
 # Source 
 
 Source can be download at <https://github.com/itead/ITEADLIB_Arduino_WeeESP8266>.
@@ -11,6 +14,9 @@ Source can be download at <https://github.com/itead/ITEADLIB_Arduino_WeeESP8266>
 You can clone it by:
 
     git clone https://github.com/itead/ITEADLIB_Arduino_WeeESP8266.git
+
+Tested with 1.5 AT Firmware
+http://bbs.espressif.com/viewtopic.php?f=46&t=1442
 
 # Documentation
 
@@ -101,9 +107,6 @@ will be useful for Arduino lovers.
 # Suppported Mainboards
   
   - Arduino UNO and its derivatives
-  - Arduino MEGA and its derivatives
-  - [Iteaduino UNO](http://imall.iteadstudio.com/im130312001.html)
-  - [WBoard Pro](http://imall.iteadstudio.com/im141125005.html)
 
 # Using SoftwareSerial
 
