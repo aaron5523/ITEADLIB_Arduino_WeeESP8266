@@ -242,6 +242,17 @@ uint32_t ESP8266::recv(uint8_t *buffer, uint32_t buffer_size,
 	return recvPkg(buffer, buffer_size, NULL, timeout, NULL);
 }
 
+bool ESP8266::recvHTTP(uint32_t timeout) {
+	String data_tmp;
+	String target = "200 OK";
+	data_tmp = recvString(target, timeout);
+
+	if (data_tmp.indexOf(target) != -1) {
+		return true;
+	}
+	return false;
+}
+
 uint32_t ESP8266::recv(uint8_t mux_id, uint8_t *buffer, uint32_t buffer_size,
 		uint32_t timeout) {
 	uint8_t id;
@@ -417,6 +428,8 @@ String ESP8266::recvString(String target1, String target2, String target3,
 bool ESP8266::recvFind(String target, uint32_t timeout) {
 	String data_tmp;
 	data_tmp = recvString(target, timeout);
+//	    debugSerial.print(F("data_tmp:"));
+//	    debugSerial.println(data_tmp);
 	if (data_tmp.indexOf(target) != -1) {
 		return true;
 	}
@@ -427,8 +440,8 @@ bool ESP8266::recvFindAndFilter(String target, String begin, String end,
 		String &data, uint32_t timeout) {
 	String data_tmp;
 	data_tmp = recvString(target, timeout);
-	debugSerial.println(F("recvFindAndFilter data_tmp: "));
-	debugSerial.println(data_tmp);
+//	debugSerial.println(F("recvFindAndFilter data_tmp: "));
+//	debugSerial.println(data_tmp);
 	if (data_tmp.indexOf(target) != -1) {
 		int32_t index1 = data_tmp.indexOf(begin);
 		int32_t index2 = data_tmp.indexOf(end);
@@ -586,14 +599,19 @@ bool ESP8266::sATCIPSTARTMultiple(uint8_t mux_id, String type, String addr,
 }
 bool ESP8266::sATCIPSENDSingle(const uint8_t *buffer, uint32_t len) {
 	rx_empty();
+//	debugSerial.println(F("Trying send"));
+//	debugSerial.print(F("AT+CIPSEND="));
+//	debugSerial.println(len);
 	Serial.print(F("AT+CIPSEND="));
 	Serial.println(len);
 	if (recvFind(">", 5000)) {
+		debugSerial.println(F("Got >, writing request to serial"));
 		rx_empty();
 		for (uint32_t i = 0; i < len; i++) {
 			Serial.write(buffer[i]);
-			debugSerial.write(buffer[i]);
+//			debugSerial.write(buffer[i]);
 		}
+//		debugSerial.println(F("Waiting for SEND OK"));
 		return recvFind("SEND OK", 10000);
 	}
 	return false;

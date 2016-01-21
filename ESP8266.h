@@ -35,7 +35,7 @@ public:
 
 	ESP8266(void);
 //#endif
-
+	void printFreeMem(void);
 	/**
 	 * Initialize Serial for ESP8266 as well as the
 	 * debug SoftwareSerial
@@ -346,6 +346,15 @@ public:
 	uint32_t recv(uint8_t *buffer, uint32_t buffer_size,
 			uint32_t timeout = 1000);
 
+
+	/**
+	 * Receive HTTP data from TCP built already in single mode.
+	 *
+	 * @param timeout - the time waiting data.
+	 * @return whether the request returned a 200 OK or not
+	 */
+	bool recvHTTP(uint32_t timeout) ;
+
 	/**
 	 * Receive data from one of TCP or UDP builded already in multiple mode.
 	 *
@@ -446,7 +455,7 @@ private:
 	bool sATCIPMUX(uint8_t mode);
 	bool sATCIPSERVER(uint8_t mode, uint32_t port = 333);
 	bool sATCIPSTO(uint32_t timeout);
-	void printFreeMem(void);
+
 	/*
 	 * +IPD,len:data
 	 * +IPD,id,len:data
