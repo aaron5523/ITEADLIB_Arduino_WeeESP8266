@@ -390,6 +390,11 @@ private:
 	void rx_empty(void);
 
 	/*
+		 * Empty the buffer or UART RX.
+		 */
+	void timed_rx_empty(uint32_t timeout);
+
+	/*
 	 * Recvive data from uart. Return all received data if target found or timeout.
 	 */
 	String recvString(String target, uint32_t timeout = 1000);

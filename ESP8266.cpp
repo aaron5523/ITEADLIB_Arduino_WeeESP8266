@@ -243,12 +243,18 @@ uint32_t ESP8266::recv(uint8_t *buffer, uint32_t buffer_size,
 }
 
 bool ESP8266::recvHTTP(uint32_t timeout) {
+	uint8_t responseBuffer[128] = { 0 };
+	uint32_t len = recvPkg(responseBuffer, sizeof(responseBuffer), NULL, 10000, NULL);
 	String data_tmp;
 	String target = "200 OK";
-	data_tmp = recvString(target, timeout);
-
-	if (data_tmp.indexOf(target) != -1) {
-		return true;
+	if (len > 0) {
+//		if (data_tmp.length() > 0) {
+		for (uint32_t i = 0; i < len; i++) {
+			data_tmp += (char) responseBuffer[i];
+		}
+		if (data_tmp.indexOf(target) != -1) {
+			return true;
+		}
 	}
 	return false;
 }
@@ -357,8 +363,19 @@ uint32_t ESP8266::recvPkg(uint8_t *buffer, uint32_t buffer_size,
 void ESP8266::rx_empty(void) {
 	while (Serial.available() > 0) {
 		Serial.read();
+		delay(1);
 	}
 }
+
+void ESP8266::timed_rx_empty(uint32_t timeout) {
+	unsigned long start;
+	start = millis();
+	while (millis() - start < timeout) {
+		rx_empty();
+		delay(1);
+	}
+}
+
 
 String ESP8266::recvString(String target, uint32_t timeout) {
 	String data;
@@ -375,8 +392,8 @@ String ESP8266::recvString(String target, uint32_t timeout) {
 			break;
 		}
 	}
-//    debugSerial.print(F("RecvString: "));
-//    debugSerial.println(data);
+	debugSerial.print(F("RecvString: "));
+	debugSerial.println(data);
 	return data;
 }
 
@@ -420,16 +437,16 @@ String ESP8266::recvString(String target1, String target2, String target3,
 			break;
 		}
 	}
-//    debugSerial.print(F("recvString data:"));
-//    debugSerial.println(data);
+	debugSerial.print(F("recvString data:"));
+	debugSerial.println(data);
 	return data;
 }
 
 bool ESP8266::recvFind(String target, uint32_t timeout) {
 	String data_tmp;
 	data_tmp = recvString(target, timeout);
-//	    debugSerial.print(F("data_tmp:"));
-//	    debugSerial.println(data_tmp);
+	debugSerial.print(F("data_tmp:"));
+	debugSerial.println(data_tmp);
 	if (data_tmp.indexOf(target) != -1) {
 		return true;
 	}
@@ -440,8 +457,8 @@ bool ESP8266::recvFindAndFilter(String target, String begin, String end,
 		String &data, uint32_t timeout) {
 	String data_tmp;
 	data_tmp = recvString(target, timeout);
-//	debugSerial.println(F("recvFindAndFilter data_tmp: "));
-//	debugSerial.println(data_tmp);
+	debugSerial.println(F("recvFindAndFilter data_tmp: "));
+	debugSerial.println(data_tmp);
 	if (data_tmp.indexOf(target) != -1) {
 		int32_t index1 = data_tmp.indexOf(begin);
 		int32_t index2 = data_tmp.indexOf(end);
@@ -556,8 +573,11 @@ bool ESP8266::eATCWLIF(String &list) {
 	return recvFindAndFilter("OK", "\r\r\n", "\r\n\r\nOK", list);
 }
 bool ESP8266::eATCIPSTATUS(String &list) {
-	delay(100);
-	rx_empty();
+	//Added because data was still streaming across from results from the HTTP request
+	timed_rx_empty(1000);
+
+//	delay(500);
+//	timed_rx_empty(1000);
 	Serial.println(F("AT+CIPSTATUS"));
 	delay(500);
 	return recvFindAndFilter("OK", "\r\r\n", "\r\n\r\nOK", list);
@@ -599,9 +619,9 @@ bool ESP8266::sATCIPSTARTMultiple(uint8_t mux_id, String type, String addr,
 }
 bool ESP8266::sATCIPSENDSingle(const uint8_t *buffer, uint32_t len) {
 	rx_empty();
-//	debugSerial.println(F("Trying send"));
-//	debugSerial.print(F("AT+CIPSEND="));
-//	debugSerial.println(len);
+	debugSerial.println(F("Trying send"));
+	debugSerial.print(F("AT+CIPSEND="));
+	debugSerial.println(len);
 	Serial.print(F("AT+CIPSEND="));
 	Serial.println(len);
 	if (recvFind(">", 5000)) {
@@ -609,9 +629,9 @@ bool ESP8266::sATCIPSENDSingle(const uint8_t *buffer, uint32_t len) {
 		rx_empty();
 		for (uint32_t i = 0; i < len; i++) {
 			Serial.write(buffer[i]);
-//			debugSerial.write(buffer[i]);
+			debugSerial.write(buffer[i]);
 		}
-//		debugSerial.println(F("Waiting for SEND OK"));
+		debugSerial.println(F("Waiting for SEND OK"));
 		return recvFind("SEND OK", 10000);
 	}
 	return false;
